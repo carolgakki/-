@@ -1,0 +1,1068 @@
+//基本界面设置
+
+var set_html_style = {
+    type: 'call-function',
+    func: function() {
+        document.body.style.backgroundColor = 'rgb(250, 250, 250)' // background color
+        document.body.style.color = 'black' // font color
+        document.body.style.fontSize = '20pt'
+        document.body.style.fontFamily = '微软雅黑'
+        document.body.style.fontWeight = 'bold' // 'normal', 'bold'
+        document.body.style.lineHeight = '1.6em' // line space
+        document.body.style.cursor = 'default' // 'default', 'none', 'wait', ...
+        document.body.onselectstart = function() { return false } // 禁止选中文字 <body oncontextmenu="return false">
+        document.body.oncontextmenu = function() { return false } // 禁用鼠标右键 <body onselectstart="return false">
+        document.onkeydown = function() {
+            // 屏蔽键盘按键 (https://www.bejson.com/othertools/keycodes/)
+            if ((event.keyCode in { 27: 'Esc', 116: 'F5', 123: 'F12' }) ||
+                (event.ctrlKey && event.keyCode in { 85: 'U' })
+            ) { return false }
+        }
+    },
+}
+
+
+/* Custom JS Functions */
+function keyCode(character) {
+    return jsPsych.pluginAPI.convertKeyCharacterToKeyCode(character)
+}
+
+function timer() {
+    var second = document.getElementById('timer')
+    var button = document.getElementsByClassName('jspsych-btn')[0]
+    if (second != null) {
+        if (second.innerHTML > 1) {
+            second.innerHTML = second.innerHTML - 1
+        } else {
+            button.innerHTML = '继续'
+            button.disabled = false
+        }
+    }
+}
+
+
+//全屏设置
+var open_fullscreen = {
+    type: 'fullscreen',
+    fullscreen_mode: true,
+    message: '<p style="font: 25px 微软雅黑; color: black">您已同意参加<br/><br/>请点击下方按钮进入全屏界面，开始正式实验</p>',
+    button_label:'进入全屏',
+    delay_after: 100
+}
+
+var close_fullscreen = {
+    type: 'fullscreen',
+    fullscreen_mode: false,
+    delay_after: 0
+}
+
+/* Global Variables */
+
+const btn_html_timer =
+    `<style onload="tid=setInterval(timer, 1000)"></style>
+     <button onclick="clearInterval(tid)" class="jspsych-btn" disabled=true>%choice%</button>`
+const feedback_right = `<span style="position: absolute; top: 55%; left: 0; right: 0; color: green"> √ </span>`
+const feedback_wrong = `<span style="font-size: 28pt;position: absolute; top: 55%; left: 0; right: 0; color: red"> X </span>`
+const subID = jsPsych.randomization.randomID(8)
+
+
+var welcome = {
+  type: 'html-keyboard-response',
+  stimulus: '<p style="font: 25px 微软雅黑; color: black"><br/>您好，欢迎参与本实验<br/></p>'+
+  '<p style="font: 20px 微软雅黑; color: black"><br/>请按任意键继续</p>',
+  choices: jsPsych.ALL_KEYS,
+}
+
+
+
+
+var consent = {
+    type: 'survey-html-form',
+    data: { varname: 'consent' },
+    preamble:'<p style="font: bold 20px 微软雅黑; text-align: left; line-height: 1.6em"><b>实验将在一个「全屏页面」开始，为保证实验效果，请您务必：<br/>\
+    （1）确保网络状况良好，否则实验无法加载<br/>\
+    （2）在电脑上进行本实验，并使用主流浏览器（Chrome、Edge、Firefox、Safari等，不要用IE）打开本网页，<br/>\
+         使用手机或平板电脑将直接标记为无效数据。<br/>\
+    （3）关掉电脑上其他正在运行的程序或将其最小化<br/>\
+    （4）将手机调至静音，并尽可能减少环境噪音干扰<br/>\
+    （5）在实验过程中不要退出全屏<br/>\
+    （6）认真作答，否则没有报酬，请对自己的宝贵时间负责<br/><br/></b></p>\
+    <p style="font:20px 微软雅黑">如果同意参与，请在下方输入"我同意参与本实验"</p>',
+    html: '<p><input name="agree" type="text" placeholder="我同意参与本实验", required /></p>',
+    
+    button_label: '继续'
+}
+
+
+var introall = {
+    type: 'instructions',
+    pages: [
+    '<p style= "font: 30px 微软雅黑"><b>\
+    本实验共有两个部分\
+    </b></p><br/>\
+    <p style= "font: 25px 微软雅黑; color:#B22222"><b>\
+    第一部分：情景故事阅读</b></p>\
+    <p style= "font: 25px 微软雅黑"><b>\
+    该部分会分别呈现两个人物的小故事，你需要阅读发生在他们各自身上的故事，并思考他们的行为。\
+    </b></p><br/>\
+    <p style= "font: 25px 微软雅黑; color:#B22222"><b>\
+    第二部分：词语、图片分类任务</b></p>\
+    <p style= "font: 25px 微软雅黑"><b>\
+    在该部分中，屏幕中央会呈现一系列词语或图片，你需要按照指示按下电脑上的相应按键对它们分类。\
+    </b></p><br/>\
+    <p style="font: 20px 微软雅黑"><b>\
+    清楚实验流程后，点击下方按钮开始</br>完成整个实验约需要8~10分钟\
+    </b></p>',
+    ],
+    show_clickable_nav: true,
+    allow_backward: false,
+    button_label_next: '开始'
+}
+
+var senario_in = {
+    type: 'html-keyboard-response',
+    stimulus: '<p>正在进入第一部分...<br/><br/>请等待5秒，或按任意键直接进入</p>',
+    choices: jsPsych.ALL_KEYS,
+    trial_duration: 5000,
+    response_ends_trial: true
+}
+
+
+var senario_intro = {
+    type: 'html-button-response',
+    stimulus: `<p style= "font: bold 25px 微软雅黑">第一部分：情景故事阅读<br/></p>
+    <img src="https://z3.ax1x.com/2021/11/22/IzTqXj.jpg" alt="IzTqXj.jpg" border="0" style="width:950px; height:534px"></img>`,
+    choices: ['继续(<span id="timer">10</span>)'],
+    button_html: btn_html_timer
+}
+
+
+
+//分情景定义变量
+
+var senario_Alex1_intro = {
+    type: 'instructions',
+    pages: [
+        `<p style="font: bold 38px 微软雅黑; color: #B22222">
+    关于Alex的故事1
+    <br/><br/>
+    <img src="https://e.im5i.com/2021/11/12/UsjlW7.png" alt="UsjlW7.png" border="0" style="width:206px; height:310px" ></img>
+    <br/>
+    <p style="font: bold 20px 微软雅黑">
+    你有10秒钟的时间阅读接下来的故事，且需要同时记忆屏幕中间的数字，时间结束页面会自动跳转
+    <br/><br/>`
+    ],
+    show_clickable_nav: true,
+    button_label_previous: '上一页',
+    button_label_next: '下一页'
+}
+
+var senario_Alex_1 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <p style="font: bold 20px 微软雅黑">故事1<br/>Alex的故事<br/><br/>
+    <img src="https://e.im5i.com/2021/11/12/UsjlW7.png" alt="UsjlW7.png" border="0" style="width:206px; height:310px" ></img>
+    <p style="font: bold 28px 微软雅黑;color: #B22222">4921853<br/> 
+    <p style="font: 18px 微软雅黑;text-align: left;line-height: 2.0em">
+   Alex在一家餐馆就餐，旁边有一位就餐者正在大声咳嗽。<br/>
+   事实上，这位就餐者被食物噎住了，急需救助，否则会有生命危险。此时并不是就餐高峰，周围没有服务员。<br/>
+   Alex根据就餐者的表情和声音判断，十分清楚就餐者噎住了。<br/>
+   Alex用自己学过的急救知识帮助噎住的就餐者。<br/>
+   经过Alex的帮助，就餐者很快恢复如常。<br/>`,
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 10000,
+    response_ends_trial: false
+}
+
+var senario_Alex2_intro = {
+    type: 'instructions',
+    pages: [
+        `<p style="font: bold 38px 微软雅黑; color: #B22222">
+    关于Alex的故事2
+    <br/><br/>
+    <img src="https://e.im5i.com/2021/11/12/UsjlW7.png" alt="UsjlW7.png" border="0" style="width:206px; height:310px" ></img>
+    <br/>
+    <p style="font: bold 20px 微软雅黑">
+    你有10秒钟的时间阅读接下来的故事，且需要同时记忆屏幕中间的数字，时间结束页面自动跳转
+    <br/><br/>`
+    ],
+    show_clickable_nav: true,
+    button_label_previous: '上一页',
+    button_label_next: '下一页'
+}
+
+var senario_Alex_2 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <p style="font: bold 20px 微软雅黑">故事2<br/>Alex的故事<br/><br/>
+    <img src="https://e.im5i.com/2021/11/12/UsjlW7.png" alt="UsjlW7.png" border="0" style="width:206px; height:310px" ></img>
+   <p style="font: bold 28px 微软雅黑;color: #B22222">2608439<br/> 
+    <p style="font: 18px 微软雅黑;text-align: left;line-height: 2.0em">
+   Alex居住的区域在进行病虫害消杀，工作人员正在向空中喷洒消杀药剂。<br/>
+   事实上，病虫害消杀使用的药剂对人和动物都是有害的，不能暴露在有药剂的环境中。<br/>
+   Alex透过窗户看到邻居家的狗正在露天阳台睡觉，邻居家中无人。<br/>
+   Alex给邻居和公寓管理员打电话说明目前的状况。<br/>
+   经妥善处理，邻居家的狗被安全地领进屋内。<br/>`,
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 10000,
+    response_ends_trial: false
+}
+
+var senario_Jeff1_intro = {
+    type: 'instructions',
+    pages: [
+        `<p style="font: bold 38px 微软雅黑; color: #B22222">
+    关于Jeff的故事1
+    <br/><br/>
+    <img src="https://e.im5i.com/2021/11/12/UsjRIw.png" alt="UsjRIw.png" border="0" style="width:206px; height:310px" ></img>
+    <br/>
+    <p style="font: bold 20px 微软雅黑">
+    你有10秒钟的时间阅读接下来的故事，且需要同时记忆屏幕中间的数字，时间结束页面自动跳转
+    <br/><br/>`
+    ],
+    show_clickable_nav: true,
+    button_label_previous: '上一页',
+    button_label_next: '下一页'
+}
+
+var senario_Jeff2_intro = {
+    type: 'instructions',
+    pages: [
+        `<p style="font: bold 38px 微软雅黑; color: #B22222">
+    关于Jeff的故事2
+    <br/><br/>
+    <img src="https://e.im5i.com/2021/11/12/UsjRIw.png" alt="UsjRIw.png" border="0" style="width:206px; height:310px" ></img>
+    <br/>
+    <p style="font: bold 20px 微软雅黑">
+    你有10秒钟的时间阅读接下来的故事，且需要同时记忆屏幕中间的数字，时间结束页面自动跳转
+    <br/><br/>`
+    ],
+    show_clickable_nav: true,
+    button_label_previous: '上一页',
+    button_label_next: '下一页'
+}
+
+var senario_Jeff_harm1 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <p style="font: bold 20px 微软雅黑">故事1<br/>Jeff的故事<br/><br/>
+    <img src="https://e.im5i.com/2021/11/12/UsjRIw.png" alt="UsjRIw.png" border="0" style="width:206px; height:310px" ></img>
+    <p style="font: bold 28px 微软雅黑;color: #B22222">3901648<br/>
+    <p style="font: 18px 微软雅黑;text-align: left;line-height: 2.0em">
+   Jeff开车回家途中，路边正有一名跑步者弯着腰，一只手放在胸前，地上还有一个空的哮喘吸入器。<br/>
+   事实上，这名跑步者患有严重的哮喘病，正哮喘发作，需要在休克前立即送往医院。<br/>
+   Jeff接触过一些关于哮喘的知识，看到哮喘吸入器和跑步者的状态，十分清楚这名跑步者哮喘发作了。<br/>
+   Jeff看了一眼跑步者，继续朝家的方向开车。<br/>
+   Jeff离开后，这名跑步者很快陷入休克状态。<br/>`,
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 10000,
+    response_ends_trial: false
+}
+
+var senario_Jeff_harm2 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <p style="font: bold 20px 微软雅黑">故事2<br/>Jeff的故事<br/><br/>
+    <img src="https://e.im5i.com/2021/11/12/UsjRIw.png" alt="UsjRIw.png" border="0" style="width:206px; height:310px" ></img>
+    <p style="font: bold 28px 微软雅黑;color: #B22222">7162594<br/>
+    <p style="font: 18px 微软雅黑;text-align: left;line-height: 2.0em">
+   Jeff和朋友在野外露营，Jeff 发现营地附近有许多野生蘑菇。<br/>
+   事实上，这种蘑菇是有毒的，吃了以后对身体有极大危害。<br/>
+   Jeff之前在菌类的书里看到过这种蘑菇，十分清楚这种蘑菇的毒性。<br/>
+   Jeff用这些蘑菇做了蘑菇汤给朋友吃。<br/>
+   Jeff的朋友吃了以后严重食物中毒。<br/>`,
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 10000,
+    response_ends_trial: false
+}
+
+
+var senario_Jeff_accid1 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <p style="font: bold 20px 微软雅黑">故事1<br/>Jeff的故事<br/><br/>
+    <img src="https://e.im5i.com/2021/11/12/UsjRIw.png" alt="UsjRIw.png" border="0" style="width:206px; height:310px" ></img>
+    <p style="font: bold 28px 微软雅黑;color: #B22222">3901648<br/>
+    <p style="font: 18px 微软雅黑;text-align: left;line-height: 2.0em">
+   Jeff是跳伞公司的员工，在零售店内负责销售工作。这天，有位顾客相中了一款降落伞，准备买下。<br/>
+   事实上，顾客选中的这款降落伞是次品，质量不过关，使用起来很危险。<br/>
+   Jeff刚到店里工作没几天，完全不清楚顾客选中的降落伞是次品。<br/>
+   Jeff把降落伞卖给了顾客。<br/>
+   顾客使用降落伞时出现了问题，受了重伤。<br/>`,
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 10000,
+    response_ends_trial: false
+}
+
+
+var senario_Jeff_accid2 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <p style="font: bold 20px 微软雅黑">故事2<br/>Jeff的故事<br/><br/>
+    <img src="https://e.im5i.com/2021/11/12/UsjRIw.png" alt="UsjRIw.png" border="0" style="width:206px; height:310px" ></img>
+    <p style="font: bold 28px 微软雅黑;color: #B22222">7162594<br/>
+    <p style="font: 18px 微软雅黑;text-align: left;line-height: 2.0em">
+   Jeff和朋友一起出去逛街，朋友穿着一件奶奶送的衣服，这件衣服看上去有些过时且邋遢。<br/>
+   事实上，Jeff朋友的奶奶最近去世了，Jeff的朋友还没有从悲伤中走出来。<br/>
+   Jeff和朋友有段时间没有联系了，完全不清楚朋友的奶奶去世了。<br/>
+   Jeff跟朋友开玩笑说他奶奶挑选衣服的眼光很差。<br/>
+   Jeff的朋友听了之后心里很难过。<br/>`,
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 10000,
+    response_ends_trial: false
+}
+
+var Alexnum1 = {
+    type: 'html-button-response',
+    data: { varname: 'Alexnum1' },
+    stimulus: '刚才阅读故事时出现的一串数字是_______<br/><br/>',
+    choices: ['4921853', '4928153'],
+}
+
+var Alexnum2 = {
+    type: 'html-button-response',
+    data: { varname: 'Alexnum2' },
+    stimulus: '刚才阅读故事时出现的一串数字是_______<br/><br/>',
+    choices: ['2604839', '2608439'],
+}
+
+var Jeffnum1 = {
+    type: 'html-button-response',
+    data: { varname: 'Jeffnum1' },
+    stimulus: '刚才阅读故事时出现的一串数字是_______<br/><br/>',
+    choices: ['3910468', '3901648'],
+}
+
+var Jeffnum2 = {
+    type: 'html-button-response',
+    data: { varname: 'Jeffnum2' },
+    stimulus: '刚才阅读故事时出现的一串数字是_______<br/><br/>',
+    choices: ['7162594', '7165294'],
+}
+
+var harm_check1 = {
+    type:'html-button-response',
+    data: { varname: 'harm_check1' },
+    stimulus: '刚才的故事中，______居住的区域在进行病虫害消杀？<br/><br/>',
+    choices: ['Jeff', 'Alex'],
+}
+
+var harm_check2 = {
+    type:'html-button-response',
+    data: { varname: 'harm_check2' },
+    stimulus: '刚才的故事中，Jeff在______时看到了跑步者。<br/><br/>',
+    choices: ['开车', '跑步'],
+}
+
+
+var acci_check1 = {
+    type:'html-button-response',
+    data: { varname: 'acci_check1' },
+    stimulus: '刚才的故事中，______居住的区域在进行病虫害消杀？<br/><br/>',
+    choices: ['Jeff', 'Alex'],
+}
+
+var acci_check2 = {
+    type:'html-button-response',
+    data: { varname: 'acci_check2' },
+    stimulus: '刚才的故事中，Jeff_____朋友的奶奶去世了。<br/><br/>',
+    choices: ['不知道', '知道'],
+}
+
+var pic_check1 = {
+    type:'html-button-response',
+    data: { varname: 'pic_check1' },
+    stimulus: '<img src="https://e.im5i.com/2021/11/12/UsjRIw.png" alt="UsjRIw.png" border="0" style="width:206px; height:310px" ></img>'+
+    '<br/><br/>'+
+    '<p style="font: bold 20px 微软雅黑">该人物的名字是？'+
+    '<br/><br/><br/>',
+    choices: ['Jeff', 'Alex'],
+}
+
+var pic_check2 = {
+    type:'html-button-response',
+    data: { varname: 'pic_check2' },
+    stimulus: '<img src="https://e.im5i.com/2021/11/12/UsjlW7.png" alt="UsjlW7.png" border="0" style="width:206px; height:310px" ></img>'+
+    '<br/><br/>'+
+    '<p style="font: bold 20px 微软雅黑">该人物的名字是？'+
+    '<br/><br/><br/>',
+    choices: ['Jeff', 'Alex'],
+}
+
+
+var diff = {
+    type: 'html-slider-response',
+    data: { varname: 'diffcult' },
+    stimulus: '阅读故事并准确记住数字对我来说_______<br/>（1 = 非常容易，7 = 非常困难）',
+    labels: ['1', '2', '3', '4', '5', '6', '7'],
+    min: 1,
+    max: 7,
+    slider_start: 7,
+    button_label: '继续',
+    require_movement: true
+}
+
+
+
+var ha_out = {
+    timeline:[
+    senario_Alex1_intro,senario_Alex_1,Alexnum1,senario_Alex2_intro,senario_Alex_2,Alexnum2,senario_Jeff1_intro,senario_Jeff_harm1,Jeffnum1,senario_Jeff2_intro,senario_Jeff_harm2,Jeffnum2,harm_check1,harm_check2,pic_check1,pic_check2,diff
+    ]
+}
+
+var aci_out = {
+    timeline:[
+    senario_Alex1_intro,senario_Alex_1,Alexnum1,senario_Alex2_intro,senario_Alex_2,Alexnum2,senario_Jeff1_intro,senario_Jeff_accid1,Jeffnum1,senario_Jeff2_intro,senario_Jeff_accid2,Jeffnum2,acci_check1,acci_check2,pic_check1,pic_check2,diff
+    ]
+}
+
+
+if (CONDITION == 1) {
+  var cond_out = ha_out
+}
+if (CONDITION == 2) {
+  var cond_out = aci_out
+}
+
+//任务2：IAT
+
+//定义按键、词语和图片
+
+var key_L = 'f'
+var key_R = 'j'
+var iat_temp = {
+    // Pairs A & Pairs B should be compatible
+    attribA: { label: '道德的', items: ['真诚', '正直', '善良', '仁慈', '慷慨'] },
+    attribB: { label: '不道德的', items: ['虚伪', '卑鄙', '恶毒', '残忍', '自私'] },
+    targetA: { label: 'Alex', items: ['<img src="https://e.im5i.com/2021/11/12/UsjyRp.png" alt="UsjyRp.png" border="0"></img>', '<img src="https://e.im5i.com/2021/11/12/UsjKUv.png" alt="UsjKUv.png" border="0"></img>', '<img src="https://e.im5i.com/2021/11/12/UsjlW7.png" alt="UsjlW7.png" border="0"></img>', '<img src="https://e.im5i.com/2021/11/12/Usjf1M.png" alt="Usjf1M.png" border="0"></img>', '<img src="https://e.im5i.com/2021/11/12/Usjag3.png" alt="Usjag3.png" border="0"></img>'] },
+    targetB: { label: 'Jeff', items: ['<img src="https://e.im5i.com/2021/11/12/UsjOCG.png" alt="UsjOCG.png" border="0"></img>', '<img src="https://e.im5i.com/2021/11/12/UsjQlY.png" alt="UsjQlY.png" border="0"></img>', '<img src="https://e.im5i.com/2021/11/12/UsjRIw.png" alt="UsjRIw.png" border="0"></img>', '<img src="https://e.im5i.com/2021/11/12/UsjNMF.png" alt="UsjNMF.png" border="0"></img>', '<img src="https://e.im5i.com/2021/11/12/Usjo9d.png" alt="Usjo9d.png" border="0"></img>'] },
+}
+
+
+// Randomize stimuli pairs (left vs. right; compatible-blocks first vs. incompatible-blocks first)
+
+var version = jsPsych.randomization.factorial({ attrib: [1, 2], target: [1, 2] })[0] // one of four, e.g., { attrib: 2, target: 1 }
+var compatible_first = (version.attrib == version.target) ? true : false
+
+var iat = JSON.parse(JSON.stringify(iat_temp)) // 深复制（iat_temp仅为指针，浅复制会同步修改两者）
+if (version.attrib == 2) {
+    iat.attribA.label = iat_temp.attribB.label
+    iat.attribA.items = iat_temp.attribB.items
+    iat.attribB.label = iat_temp.attribA.label
+    iat.attribB.items = iat_temp.attribA.items
+}
+if (version.target == 2) {
+    iat.targetA.label = iat_temp.targetB.label
+    iat.targetA.items = iat_temp.targetB.items
+    iat.targetB.label = iat_temp.targetA.label
+    iat.targetB.items = iat_temp.targetA.items
+}
+
+// Top-left and top-right tags
+
+var tag_IAT_prac_attrib =  `<span style="font-size:18pt; position: absolute; top: 10%; left:12%; color:black">按“${key_L.toUpperCase()}”键</span>
+                           <span style="font-size:24pt; position: absolute; top: 15%; left:12%;color:	#0000CD">${iat.attribA.label}</span>
+                           <span style="font-size: 18pt; position: absolute; top: 10%; right:12%; color:black">按“${key_R.toUpperCase()}”键</span>
+                           <span style="font-size:24pt; position: absolute; top: 15%; right:12%;color:#0000CD">${iat.attribB.label}</span>`
+                           
+
+var tag_IAT_prac_target_1 = `<span style="font-size:18pt; position: absolute; top: 10%; left:12%; color:black">按“${key_L.toUpperCase()}”键</span>
+                             <span style="font-size:28pt; position: absolute; top: 15%; left:12%; color:#228B22">${iat.targetA.label}</span>
+                             <span style="font-size: 18pt; position: absolute; top: 10%; right:12%; color:black">按“${key_R.toUpperCase()}”键 </span>
+                             <span style="font-size:28pt; position: absolute; top: 15%; right:12%; color:#228B22">${iat.targetB.label}</span>`
+
+
+var tag_IAT_prac_target_2 =`<span style="font-size:18pt; position: absolute; top: 10%; left:12%; color:black">按“${key_L.toUpperCase()}”键</span>
+                             <span style="font-size:28pt; position: absolute; top: 15%; left:12%; color:#228B22">${iat.targetB.label}</span>
+                             <span style="font-size: 18pt; position: absolute; top: 10%; right:12%; color:black">按“${key_R.toUpperCase()}”键 </span>
+                             <span style="font-size:28pt; position: absolute; top: 15%; right:12%; color:#228B22">${iat.targetA.label}</span>`
+
+var tag_IAT_test_1 =  `<span style="font-size:20pt; position: absolute; top: 10%; left:12%; color:black">按“${key_L.toUpperCase()}”键 </span>
+                       <span style="font-size:24pt; position: absolute; top: 15%; left:12%; color:#0000CD">${iat.attribA.label}</span>
+                       <span style="font-size:20pt; position: absolute; top: 20%; left:14%; color:black">或</span>
+                       <span style="font-size:28pt; position: absolute; top: 25%; left:12%; color:#228B22">${iat.targetA.label}</span>
+                       <span style="font-size:20pt; position: absolute; top: 10%; right:12%; color:black">按“${key_R.toUpperCase()}”键 </span>
+                       <span style="font-size:24pt; position: absolute; top: 15%; right:12%; color:#0000CD">${iat.attribB.label}</span>
+                       <span style="font-size:20pt; position: absolute; top: 20%; right:15%; color:black">或</span>
+                       <span style="font-size:28pt; position: absolute; top: 25%; right:14%; color:#228B22">${iat.targetB.label}</span>`
+                      
+
+var tag_IAT_test_2 = ` <span style="font-size:20pt; position: absolute; top: 10%; left:12%; color:black">按“${key_L.toUpperCase()}”键 </span>
+                       <span style="font-size:24pt; position: absolute; top: 15%; left:12%; color:#0000CD">${iat.attribA.label}</span>
+                       <span style="font-size:20pt; position: absolute; top: 20%; left:14%; color:black">或</span>
+                       <span style="font-size:28pt; position: absolute; top: 25%; left:12%; color:#228B22">${iat.targetB.label}</span>
+                       <span style="font-size:20pt; position: absolute; top: 10%; right:12%; color:black">按“${key_R.toUpperCase()}”键 </span>
+                       <span style="font-size:24pt; position: absolute; top: 15%; right:12%; color:#0000CD">${iat.attribB.label}</span>
+                       <span style="font-size:20pt; position: absolute; top: 20%; right:15%; color:black">或</span>
+                       <span style="font-size:28pt; position: absolute; top: 25%; right:14%; color:#228B22">${iat.targetA.label}</span>`
+                      
+
+//IAT-Introdunction
+
+var IAT_intro0 = {
+    type: 'instructions',
+    pages: [
+      '<br/>'+
+      '第二部分：词语、图片分类任务'+
+      '<br/>'+
+      `<p style="font: 20px 微软雅黑; text-align: left; line-height = 2.0em">接下来，需要对一系列 <span style= "color:#B22222">词语</span> 或 <span style= "color:#B22222">图片</span> 分类，
+      <br/>
+      这些词语或图片会出现在 <span style= "color:#B22222">屏幕中央</span>，归属的类别会始终显示在屏幕的 <span style= "color:#B22222">左上角和右上角</span> ，
+      <br/>
+      你需要根据屏幕上的指示，对不同类别的词语和图片做出按键反应，将其归类。
+      <br/><br/>
+      具体的词语和图片及其对应类别如下表所示，为了更顺利地完成任务，请先熟悉下列材料（下滑可见完整表格）。
+      <br/><br/></p>`+
+      '<img src="https://e.im5i.com/2021/11/12/UsTxwx.png" alt="UsTxwx.png" border="0" style="width:800px; height:530px" ></img>'
+      ],
+    show_clickable_nav: true,
+    allow_backward: false,
+    button_label_next: '继续'
+};
+
+var IAT_prac = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <span style="font-size: 20pt; position: absolute; bottom: 15%; left: 0; right: 0"><b>
+    下面请对“${iat.targetA.label}”和“${iat.targetB.label}”的图片分类进行练习<br/><br/><br/>
+    Alex或Jeff的图片会出现在屏幕中央，两人的名字将始终显示在屏幕上方<br/>
+    <span style="color:red"><b>请根据屏幕上方的指示，快速并准确地对图片做出按键反应</b></span><br/>
+    当按键错误时屏幕中会出现<span style="color:red"> X </span>，需要按另一个键纠正才能继续<br/><br/>
+    请把双手食指分别放在键盘的“${key_L.toUpperCase()}”键和“${key_R.toUpperCase()}”键上<br/>
+    按<空格键>开始`,
+    choices: [' '],
+    prompt: tag_IAT_prac_target_1
+}
+
+var IAT_prac_end = {
+    type: 'instructions',
+    pages: [
+    '<p style= "font: 30px 微软雅黑"><b>\
+    练习结束，请按开始进入正式实验'
+    ],
+    show_clickable_nav: true,
+    allow_backward: false,
+    button_label_next: '开始',
+}
+
+var IAT_intro1 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <span style="font-size: 20pt; position: absolute; bottom: 15%; left: 0; right: 0"><b>
+    任务1：对“${iat.attribA.label}”和“${iat.attribB.label}”词语分类<br/><br/><br/>
+    不同词语会出现在屏幕中央，类别标签将始终显示在屏幕上方<br/>
+    <span style="color:red"><b>请根据屏幕上方的指示，快速并准确地对词语做出按键反应</b></span><br/>
+    当按键错误时屏幕中会出现<span style="color:red"> X </span>，需要按另一个键纠正才能继续<br/><br/>
+    请把双手食指分别放在键盘的“${key_L.toUpperCase()}”键和“${key_R.toUpperCase()}”键上<br/>
+    按<空格键>开始
+    </b>`,
+    choices: [' '],
+    prompt: tag_IAT_prac_attrib
+}
+
+var IAT_intro2 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <span style="font-size: 20pt; position: absolute; bottom: 15%; left: 0; right: 0"><b>
+    任务2：对“${iat.targetA.label}”和“${iat.targetB.label}”的图片分类<br/><br/><br/>
+    Alex或Jeff的图片会出现在屏幕中央，两人的名字将始终显示在屏幕上方<br/>
+    <span style="color:red"><b>请根据屏幕上方的指示，快速并准确地对图片做出按键反应</b></span><br/>
+    当按键错误时屏幕中会出现<span style="color:red"> X </span>，需要按另一个键纠正才能继续<br/><br/>
+    请把双手食指分别放在键盘的“${key_L.toUpperCase()}”键和“${key_R.toUpperCase()}”键上<br/>
+    按<空格键>开始`,
+    choices: [' '],
+    prompt: tag_IAT_prac_target_1
+}
+
+
+var IAT_intro3 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <span style="font-size: 20pt; position: absolute; bottom: 15%; left: 0; right: 0"><b>
+    任务3：对“${iat.attribA.label}/${iat.targetA.label}”和“${iat.attribB.label}/${iat.targetB.label}”的组合分类 <br/><br/><br/>
+    词汇和图片会交替呈现在屏幕中央，类别标签将始终显示在屏幕上方<br/>
+    <span style="color:red"><b>请根据屏幕上方的指示，快速并准确地对图片做出按键反应</b></span><br/>
+    当按键错误时屏幕中会出现<span style="color:red"> X </span>，需要按另一个键纠正才能继续<br/><br/>
+    请把双手食指分别放在键盘的“${key_L.toUpperCase()}”键和“${key_R.toUpperCase()}”键上<br/>
+    按<空格键>开始`,
+    choices: [' '],
+    prompt: tag_IAT_test_1
+}
+
+var IAT_intro4 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <span style="font-size: 20pt; position: absolute; bottom: 15%; left: 0; right: 0"><b>
+    任务4：对“${iat.attribA.label}/${iat.targetA.label}”和“${iat.attribB.label}/${iat.targetB.label}”的组合分类 <br/>
+    （与上一任务完全相同，请再次分类）<br/><br/>
+    词汇和图片会交替呈现在屏幕中央，类别标签将始终显示在屏幕上方<br/>
+    <span style="color:red"><b>请根据屏幕上方的指示，快速并准确地对图片做出按键反应</b></span><br/>
+    当按键错误时屏幕中会出现<span style="color:red"> X </span>，需要按另一个键纠正才能继续<br/><br/>
+    请把双手食指分别放在键盘的“${key_L.toUpperCase()}”键和“${key_R.toUpperCase()}”键上<br/>
+    按<空格键>开始`,
+    choices: [' '],
+    prompt: tag_IAT_test_1
+}
+
+
+
+var IAT_intro5 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+    <span style="font-size: 20pt; position: absolute; bottom: 15%; left: 0; right: 0"><b>
+    任务5：对“${iat.targetB.label}”和“${iat.targetA.label}”的图片分类<br/>
+    （请注意，屏幕上方的名字互换了位置）<br/><br/>
+    Jeff或Alex的图片会出现在屏幕中央，两人的名字将始终显示在屏幕上方<br/>
+    <span style="color:red"><b>请根据屏幕上方的指示，快速并准确地对图片做出按键反应</b></span><br/>
+    当按键错误时屏幕中会出现<span style="color:red"> X </span>，需要按另一个键纠正才能继续<br/><br/>
+    请把双手食指分别放在键盘的“${key_L.toUpperCase()}”键和“${key_R.toUpperCase()}”键上<br/>
+    按<空格键>开始`,
+    choices: [' '],
+    prompt: tag_IAT_prac_target_2
+}
+
+
+var IAT_intro6 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+     <span style="font-size: 20pt; position: absolute; bottom: 15%; left: 0; right: 0"><b>
+    任务6：对“${iat.attribA.label}/${iat.targetB.label}”和“${iat.attribB.label}/${iat.targetA.label}”的组合分类<br/><br/><br/>
+    词汇和图片会交替呈现在屏幕中央，类别标签将始终显示在屏幕上方<br/>
+    <span style="color:red"><b>请根据屏幕上方的指示，快速并准确地对图片做出按键反应</b></span><br/>
+    当按键错误时屏幕中会出现<span style="color:red"> X </span>，需要按另一个键纠正才能继续<br/><br/>
+    请把双手食指分别放在键盘的“${key_L.toUpperCase()}”键和“${key_R.toUpperCase()}”键上<br/>
+    按<空格键>开始`,
+    choices: [' '],
+    prompt: tag_IAT_test_2
+}
+
+var IAT_intro7 = {
+    type: 'html-keyboard-response',
+    stimulus: `
+     <span style="font-size: 20pt; position: absolute; bottom: 15%; left: 0; right: 0"><b>
+    任务7：对“${iat.attribA.label}/${iat.targetB.label}”和“${iat.attribB.label}/${iat.targetA.label}”的组合分类<br/>
+    （与上一任务完全相同，请再次分类）<br/><br/>
+    词汇和图片会交替呈现在屏幕中央，类别标签将始终显示在屏幕上方<br/>
+    <span style="color:red"><b>请根据屏幕上方的指示，快速并准确地对图片做出按键反应</b></span><br/>
+    当按键错误时屏幕中会出现<span style="color:red"> X </span>，需要按另一个键纠正才能继续<br/><br/>
+    请把双手食指分别放在键盘的“${key_L.toUpperCase()}”键和“${key_R.toUpperCase()}”键上<br/>
+    按<空格键>开始`,
+    choices: [' '],
+    prompt: tag_IAT_test_2
+}
+
+
+// Generate IAT stimuli and blocks
+
+function generateRandomTrials(n_trials, arr, neighbor_different = true) {
+    var repeats = Math.floor(n_trials / arr.length)
+    if (repeats >= 1) {
+        var array1 = jsPsych.randomization.repeat(arr, repeats)
+        var array2 = jsPsych.randomization.sampleWithoutReplacement(arr, n_trials - array1.length)
+        var array = array1.concat(array2)
+    } else {
+        var array = jsPsych.randomization.sampleWithoutReplacement(arr, n_trials)
+    }
+    if (neighbor_different) {
+        array = jsPsych.randomization.shuffleNoRepeats(array)
+    }
+    return array
+}
+
+
+function crossArrays(arr1, arr2) {
+    var arr = []
+    for (var i in arr1) { arr.push(arr1[i], arr2[i]) }
+    return arr
+}
+
+function toStimuli(array) {
+    for (var i in array) { array[i] = { s: array[i] } }
+    return array
+}
+
+function blockTemplateIAT(block_id, tag, stimuli, stim_func, key_answer_func, iti = 400) {
+    var IAT = {
+        timeline_variables: toStimuli(stimuli),
+        timeline: [{
+            type: 'html-keyboard-response',
+            stimulus: '',
+            choices: jsPsych.NO_KEYS,
+            prompt: tag,
+            trial_duration: iti, // inter-trial interval
+            response_ends_trial: false
+        }, {
+            type: 'categorize-html',
+            data: { IAT: block_id },
+            stimulus: stim_func,
+            choices: [key_L, key_R],
+            key_answer: key_answer_func,
+            prompt: tag,
+            correct_text: tag,
+            incorrect_text: tag + feedback_wrong,
+            feedback_duration: 0,
+            show_stim_with_feedback: true,
+            force_correct_button_press: true,
+            on_finish: function(data) { data.RT = data.rt } // for computing IAT D-score in feedback
+        }]
+    }
+    return IAT
+}
+
+//具体的每个block
+
+var IAT1 = blockTemplateIAT(
+    block_id = 1,
+    tag = tag_IAT_prac_attrib,
+    stimuli = generateRandomTrials(20, [].concat(iat.attribA.items, iat.attribB.items)),
+    stim_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        return `<p style="font-size:45px;color:black">${stim}</p>`
+    },
+   key_answer_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        if (iat.attribA.items.includes(stim))
+         
+          { return keyCode(key_L)} 
+         
+        if (iat.attribB.items.includes(stim))
+        
+          {return keyCode(key_R)}
+   }
+)
+
+var IAT2 = blockTemplateIAT(
+    block_id = 2,
+    tag = tag_IAT_prac_target_1,
+    stimuli = generateRandomTrials(20, [].concat(iat.targetA.items, iat.targetB.items)),
+    stim_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        return `<p>${stim}</p>`
+    },
+    key_answer_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        if (iat.targetA.items.includes(stim)) { return keyCode(key_L) }
+        if (iat.targetB.items.includes(stim)) { return keyCode(key_R) }
+    }
+)
+
+
+var IAT3 = blockTemplateIAT(
+    block_id = 3,
+    tag = tag_IAT_test_1,
+    stimuli = crossArrays(
+        generateRandomTrials(10, [].concat(iat.attribA.items, iat.attribB.items)),
+        generateRandomTrials(10, [].concat(iat.targetA.items, iat.targetB.items)),
+    ),
+    stim_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        if ([].concat(iat.attribA.items, iat.attribB.items).includes(stim)) {
+            return `<p style="font-size:45px;color:black">${stim}</p>`
+        }
+        if ([].concat(iat.targetA.items, iat.targetB.items).includes(stim)) {
+            return `<p style="width:260px; height:390px">${stim}</p>`
+        }
+    },
+    key_answer_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        if ([].concat(iat.attribA.items, iat.targetA.items).includes(stim)) { return keyCode(key_L) }
+        if ([].concat(iat.attribB.items, iat.targetB.items).includes(stim)) { return keyCode(key_R) }
+    }
+)
+
+var IAT4 = blockTemplateIAT(
+    block_id = 4,
+    tag = tag_IAT_test_1,
+    stimuli = crossArrays(
+        generateRandomTrials(20, [].concat(iat.attribA.items, iat.attribB.items)),
+        generateRandomTrials(20, [].concat(iat.targetA.items, iat.targetB.items)),
+    ),
+    stim_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        if ([].concat(iat.attribA.items, iat.attribB.items).includes(stim)) {
+            return `<p style="font-size:45px;color:black">${stim}</p>`
+        }
+        if ([].concat(iat.targetA.items, iat.targetB.items).includes(stim)) {
+            return `<p>${stim}</p>`
+        }
+    },
+    key_answer_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        if ([].concat(iat.attribA.items, iat.targetA.items).includes(stim)) { return keyCode(key_L) }
+        if ([].concat(iat.attribB.items, iat.targetB.items).includes(stim)) { return keyCode(key_R) }
+    }
+)
+
+var IAT5 = blockTemplateIAT(
+    block_id = 5,
+    tag = tag_IAT_prac_target_2,
+    stimuli = generateRandomTrials(20, [].concat(iat.targetB.items, iat.targetA.items)),
+    stim_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        return `<p style="width:260px; height:390px">${stim}</p>`
+    },
+    key_answer_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        if (iat.targetB.items.includes(stim)) { return keyCode(key_L) }
+        if (iat.targetA.items.includes(stim)) { return keyCode(key_R) }
+    }
+)
+
+var IAT6 = blockTemplateIAT(
+    block_id = 6,
+    tag = tag_IAT_test_2,
+    stimuli = crossArrays(
+        generateRandomTrials(10, [].concat(iat.attribA.items, iat.attribB.items)),
+        generateRandomTrials(10, [].concat(iat.targetB.items, iat.targetA.items)),
+    ),
+    stim_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        if ([].concat(iat.attribA.items, iat.attribB.items).includes(stim)) {
+            return `<p style="font-size:45px;color:black">${stim}</p>`
+        }
+        if ([].concat(iat.targetB.items, iat.targetA.items).includes(stim)) {
+            return `<p>${stim}</p>`
+        }
+    },
+    key_answer_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        if ([].concat(iat.attribA.items, iat.targetB.items).includes(stim)) { return keyCode(key_L) }
+        if ([].concat(iat.attribB.items, iat.targetA.items).includes(stim)) { return keyCode(key_R) }
+    }
+)
+
+var IAT7 = blockTemplateIAT(
+    block_id = 7,
+    tag = tag_IAT_test_2,
+    stimuli = crossArrays(
+        generateRandomTrials(20, [].concat(iat.attribA.items, iat.attribB.items)),
+        generateRandomTrials(20, [].concat(iat.targetB.items, iat.targetA.items)),
+    ),
+    stim_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        if ([].concat(iat.attribA.items, iat.attribB.items).includes(stim)) {
+            return `<p style="font-size:45px;color:black">${stim}</p>`
+        }
+        if ([].concat(iat.targetB.items, iat.targetA.items).includes(stim)) {
+            return `<p>${stim}</p>`
+        }
+    },
+    key_answer_func = function() {
+        var stim = jsPsych.timelineVariable('s', true)
+        if ([].concat(iat.attribA.items, iat.targetB.items).includes(stim)) { return keyCode(key_L) }
+        if ([].concat(iat.attribB.items, iat.targetA.items).includes(stim)) { return keyCode(key_R) }
+    }
+)
+
+/* Blocks: Feedbacks*/
+
+function replaceWrongRT(df) {
+    // Replace each wrong-trial RT with block mean + 600 ms (Greewald et al., 2003, JPSP)
+    var rt_mean = df.filter({ correct: true }).select('rt').mean()
+    var wrong = df.filter({ correct: false }).values() // raw data array (modifiable)
+    for (var i in wrong) {
+        wrong[i]['RT'] = rt_mean + 600
+    }
+}
+
+var IAT_results = { IAT_D: null, IAT_D_prac: null, IAT_D_test: null }
+
+var debrief_IAT = {
+    type: 'html-keyboard-response',
+    on_start: set_html_style,
+    stimulus: function() {
+        // See the scoring algorithm of IAT D-score in Greewald et al. (2003)
+        if (compatible_first) {
+            var block_ids = { compat: [{ IAT: 3 }, { IAT: 4 }], incomp: [{ IAT: 6 }, { IAT: 7 }] }
+        } else {
+            var block_ids = { compat: [{ IAT: 6 }, { IAT: 7 }], incomp: [{ IAT: 3 }, { IAT: 4 }] }
+        }
+        var df_iat_raw = jsPsych.data.get().filter([{ IAT: 3 }, { IAT: 4 }, { IAT: 6 }, { IAT: 7 }]) // data frame (jsPsych 'Data Collection' class)
+        var df = df_iat_raw.filterCustom(function(trial) { return trial.rt < 10000 })
+
+        var n_trials_less_than_300ms = df.filterCustom(function(trial) { return trial.rt < 300 }).count()
+        var p_too_fast = n_trials_less_than_300ms / df.count()
+        var validity = (p_too_fast < 0.1) ? `` :
+            `<span style="color:red">抱歉，由于你的随意按键反应过多（${(100 * p_too_fast).toFixed(1)}%），结果无效，请直接关闭浏览器结束实验。</span><br/>`
+
+        var iat_compat_prac = df.filter(block_ids.compat[0])
+        var iat_compat_test = df.filter(block_ids.compat[1])
+        var iat_incomp_prac = df.filter(block_ids.incomp[0])
+        var iat_incomp_test = df.filter(block_ids.incomp[1])
+
+        replaceWrongRT(iat_compat_prac)
+        replaceWrongRT(iat_compat_test)
+        replaceWrongRT(iat_incomp_prac)
+        replaceWrongRT(iat_incomp_test)
+
+        var mean_diff_prac = iat_incomp_prac.select('RT').mean() - iat_compat_prac.select('RT').mean()
+        var mean_diff_test = iat_incomp_test.select('RT').mean() - iat_compat_test.select('RT').mean()
+        var sd_pooled_prac = iat_compat_prac.join(iat_incomp_prac).select('rt').sd()
+        var sd_pooled_test = iat_compat_test.join(iat_incomp_test).select('rt').sd()
+        var IAT_D_prac = mean_diff_prac / sd_pooled_prac
+        var IAT_D_test = mean_diff_test / sd_pooled_test
+        var IAT_D = (IAT_D_prac + IAT_D_test) / 2
+
+        IAT_results.IAT_D = IAT_D
+        IAT_results.IAT_D_prac = IAT_D_prac
+        IAT_results.IAT_D_test = IAT_D_test
+
+        return `
+        <p style="text-align: left; color:rgb(250, 250, 250">
+        <b>结果反馈：</b><br/>
+        ${validity}
+        你的内隐联系测验<em>D </em>分数 = <b>${IAT_D.toFixed(2)}</b><br/>
+        ——练习任务<em>D </em>分数 = ${IAT_D_prac.toFixed(2)}<br/>
+        &emsp;&emsp;（反应时之差 = ${mean_diff_prac.toFixed(0)}ms，合并标准差 = ${sd_pooled_prac.toFixed(0)}ms）<br/>
+        ——正式任务<em>D </em>分数 = ${IAT_D_test.toFixed(2)}<br/>
+        &emsp;&emsp;（反应时之差 = ${mean_diff_test.toFixed(0)}ms，合并标准差 = ${sd_pooled_test.toFixed(0)}ms）<br/></p>
+        <p style=" font-size:30px color: black"> 第二部分已完成，按任意键继续</p>
+        <p style="text-align: left; color:white"> <br/><b><em>D </em>分数解释：</b><br/>
+        大于0：对「${iat_temp.attribA.label} + ${iat_temp.targetA.label}」「${iat_temp.attribB.label} + ${iat_temp.targetB.label}」的内隐联系更紧密<br/>
+        小于0：对「${iat_temp.attribA.label} + ${iat_temp.targetB.label}」「${iat_temp.attribB.label} + ${iat_temp.targetA.label}」的内隐联系更紧密<br/>
+        绝对值：0.2 = 小效应，0.5 = 中等效应，0.8 = 大效应<br/></p>`
+    },
+    on_finish: function(data) {
+        data.varname = 'IAT_feedback'
+        data.summary = JSON.stringify(IAT_results)
+            // extract in R:  jsonlite::fromJSON(subset(data, varname=='IAT_feedback')$summary)
+    }
+}
+
+
+var demo = {    
+    type: 'instructions',
+    pages: [
+      '最后，请填写个人基本信息。<br/>'
+      ],
+    show_clickable_nav: true,
+    allow_backward: false,
+    button_label_next: '继续'
+}
+
+
+var na = {
+  type: 'survey-html-form',
+  data: { varname: 'na' },
+  preamble: '<p> 您的姓名<br/>（必须输入真实姓名，通过支付宝向您支付酬劳时需要核实姓名是否一致）<br/> </p>',
+  html: '<p><input name="name" type="text" required /></p>',
+  button_label: '继续'
+};
+
+var sex = {
+    type: 'html-button-response',
+    data: { varname: 'sex' },
+    stimulus: '您的性别：<br/><br/>',
+    choices: ['男', '女', '其他'],
+    button_label: '继续'
+}
+
+var Age = {
+    type: 'survey-html-form',
+    data: { varname: 'Age' },
+    preamble: '你的年龄<br/>',
+    html: `
+    <p><input name="Q0" type="number" min=16 max=30
+    oninput="if(value.length>2) value=value.slice(0,2)" required /></p>`,
+    button_label: '继续',
+}
+
+
+var nation = {
+    type: 'html-button-response',
+    data: { varname: 'nation' },
+    stimulus: '您的民族：<br/><br/>',
+    choices: ['汉族', '其他民族'],
+    button_label: '继续'
+}
+
+var edu = {
+    type: 'survey-html-form',
+    data: { varname: 'edu' },
+    preamble: '<p>您的教育水平：</p>',
+    html: `
+    <p><select name="Q0" size=10>
+    <option>大专及以下</option>
+    <option>大学本科</option>
+    <option>硕士研究生</option>
+    <option>博士</option>
+    <option>其他</option>
+    </select></p>`,
+    button_label: '继续'
+}
+
+var school = {    
+    type: 'survey-html-form',
+    data: { varname: 'school' },
+    preamble: '<p>您的学校：</p>',
+    html: ' <p><input name="Q0" type="text" required /></p>',
+    button_label: '继续'
+}
+
+
+var payment = {    
+    type: 'survey-html-form',
+    data: { varname: 'Payment' },
+    preamble: '<p>您的支付宝账号：<br/>（请输入正确的支付宝账号，否则可能无法收到酬劳）<br/></p>',
+    html: '<p><input name="Q0" type="text" placeholder="请输入正确的支付宝账号" required /></p>',
+    button_label: '继续'
+}
+
+
+var end = {    
+    type: 'instructions',
+    pages: [`
+    实验已完成，非常感谢您的参与，点击下方“完成”按钮即可退出（数据需要自动上传，请勿直接关闭浏览器）。<br/>
+    实验酬劳将在一周内发放到您的支付宝账户，请注意查收。<br/>
+    有任何疑问或建议可联系主试，欢迎交流。<br/>
+    邮箱：892676503@qq.com<br/><br/>`],
+    show_clickable_nav: true,
+    allow_backward: false,
+    button_label_next: '完成'
+}
+  
+
+
+
+//整合时间线//
+
+
+var intro_z = {
+    timeline: [welcome,consent,open_fullscreen,introall
+  ]
+};
+
+var sena_z = {
+    timeline:[senario_in,senario_intro,cond_out
+   ]
+};
+
+var IAT_time = {
+      timeline: [
+        IAT_intro0, IAT_prac, IAT2, IAT_prac_end,
+        IAT_intro1, IAT1,
+        IAT_intro2, IAT2,
+        IAT_intro3, IAT3,
+        IAT_intro4, IAT4,
+        IAT_intro5, IAT5,
+        IAT_intro6, IAT6,
+        IAT_intro7, IAT7,
+    ]
+};
+
+
+var demograph = {
+  timeline:[demo,na,sex,Age,nation,edu,school,payment,end]
+}
+
+var main_timeline = [set_html_style,intro_z,sena_z,IAT_time,debrief_IAT,demograph,close_fullscreen];
+
+
+
+
+jsPsych.init({
+        timeline:main_timeline,
+         on_finish: function() {
+            var all_data = jsPsych.data.get().csv();
+         }
+    })
